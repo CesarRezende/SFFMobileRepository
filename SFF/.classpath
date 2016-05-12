@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/kobjects-j2me-0.0-SNAPSHOT-20040926-2.jar"/>
+	<classpathentry kind="lib" path="libs/ksoap2-android-3.4.0.jar"/>
+	<classpathentry kind="lib" path="libs/ksoap2-base-3.4.0.jar"/>
+	<classpathentry kind="lib" path="libs/ksoap2-j2se-3.4.0.jar"/>
+	<classpathentry kind="lib" path="libs/kxml-2.2.4.jar"/>
+	<classpathentry kind="lib" path="libs/xmlpull-1.1.3.3.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
