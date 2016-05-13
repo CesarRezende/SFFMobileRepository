@@ -18,7 +18,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -141,6 +143,80 @@ public class MovFinancActivity extends Activity implements TaskListener {
 
 			manualChkField.setChecked(this.movFinanc.isManual());
 
+			this.statusExpectedOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					MovFinancActivity.this.movFinanc.setSituacao(Character.valueOf('P'));
+	                MovFinancActivity.this.movFinanc.setDataRealizada(null);
+	                MovFinancActivity.this.fulfillmentDateField.setText("");
+	                MovFinancActivity.this.fulfillmentDateField.setEnabled(false);
+					
+				}
+			});
+            this.statusAccomplishOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					MovFinancActivity.this.movFinanc.setSituacao(Character.valueOf('R'));
+	                MovFinancActivity.this.movFinanc.setDataRealizada(null);
+	                MovFinancActivity.this.fulfillmentDateField.setText("");
+	                MovFinancActivity.this.fulfillmentDateField.setEnabled(true);
+					
+				}
+			});
+            this.movtypeCreditOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					MovFinancActivity.this.movFinanc.setTipoMovimentacao(Character.valueOf('C'));
+	                MovFinancActivity.this.spendTypeFieldPos = -1;
+	                MovFinancActivity.this.tipoGastoList = new ArrayList();
+	                MovFinancActivity.this.renderSpendTypeField();
+	                MovFinancActivity.this.spendTypeField.setEnabled(false);
+				}
+			});
+            this.movtypeDebitOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					MovFinancActivity.this.movFinanc.setTipoMovimentacao(Character.valueOf('D'));
+	                MovFinancActivity.this.loadTipoGasto();
+	                MovFinancActivity.this.spendTypeField.setEnabled(true);
+				}
+			});
+            this.expectedDateField.setOnTouchListener(new OnTouchListener() {
+				
+				@Override
+				public boolean onTouch(View view, MotionEvent event) {
+//					if (event.getAction() == 0) {
+//		                view.clearFocus();
+//		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
+//		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
+//		                MovFinancActivity.this.movFinancActivity.startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.TIPOGASTO_REQUEST_TASK);
+//		            }
+		            return true;
+				}
+			});
+            this.fulfillmentDateField.setOnTouchListener(new OnTouchListener() {
+				
+				@Override
+				public boolean onTouch(View view, MotionEvent event) {
+//					if (event.getAction() == 0) {
+//		                view.clearFocus();
+//		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
+//		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
+//		                MovFinancActivity.this.movFinancActivity.startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.TIPOGASTO_REQUEST_TASK);
+//		            }
+		            return true;
+				}
+			});
+			this.valueField.addTextChangedListener(new CurrencyWatcher(this.valueField));
+            this.fineField.addTextChangedListener(new CurrencyWatcher(this.fineField));
+            this.discountField.addTextChangedListener(new CurrencyWatcher(this.discountField));
+            this.interestRateField.addTextChangedListener(new CurrencyWatcher(this.interestRateField));
+            
 			if (this.movFinanc.getSituacao().equals('R')) {
 				statusAccomplishOpt.setChecked(true);
 			} else {
