@@ -535,7 +535,8 @@ public class MainActivity extends Activity {
 		public static final String OPTION_NUMBER = "option_number";
 		private static final int MOVFINANC_CONSULT_REQUEST_TASK = 1;
 		private static final int MOVFINANC_DELETE_REQUEST_TASK = 2;
-
+		private static final int MOVFINANC_ACCOMPLISH_REQUEST_TASK = 3;
+		
 		private WSMovFinacTask task;
 		private ProgressDialog pDialog;
 		private List<MovimentacaoFinanceira> listMovFinac = new ArrayList<MovimentacaoFinanceira>();
@@ -962,6 +963,13 @@ public class MainActivity extends Activity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
+								task = new WSMovFinacTask(getActivity(),
+										contentFragment, listMovFinac,
+										MOVFINANC_ACCOMPLISH_REQUEST_TASK);
+								task.execute(
+										WSMovFinacTask.WebServiceMethod.ACCOMPLISHING,
+										movFinac, listMovFinac,
+										filtedListMovFinac, inSearch);
 
 							}
 						}, new DialogInterface.OnClickListener() {

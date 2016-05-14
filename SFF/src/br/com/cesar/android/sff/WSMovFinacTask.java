@@ -17,7 +17,7 @@ import android.util.Log;
 public class WSMovFinacTask extends GenericWSTask {
 
 	public static enum WebServiceMethod {
-		CONSULTING, EDITING, INSERTING, DELETING
+		CONSULTING, EDITING, INSERTING, DELETING, ACCOMPLISHING
 
 	}
 
@@ -54,6 +54,9 @@ public class WSMovFinacTask extends GenericWSTask {
 
 			callWSDeleteMovimentacaoFinanceira(movFinanc, listMovFinac,
 					filtedListMovFinac, inSearch);
+			break;
+		case ACCOMPLISHING:
+			callWSFulfillMovimentacaoFinanceira((MovimentacaoFinanceira) params[1]);
 			break;
 		default:
 			break;
@@ -269,6 +272,45 @@ public class WSMovFinacTask extends GenericWSTask {
 		}
 	}
 
+	protected void callWSFulfillMovimentacaoFinanceira(MovimentacaoFinanceira movFinanc) {
+        SoapObject soap = new SoapObject("http://controller/", "fulfillMovFinancExternal");
+        
+        if (hasConnection()) {
+        	
+            soap.addProperty("userId", this.userID);
+            soap.addProperty("password", this.password);
+            soap.addProperty("id", movFinanc.getId().toString());
+            
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(soap);
+            
+            Log.i("NGVL", "Chamando Webservice");
+            
+            HttpTransportSE httpTransport = new HttpTransportSE(currentWebserviceAddress, this.connectionTimeout);
+            httpTransport.debug = true;
+            try {
+                httpTransport.call("", envelope);
+                
+                String webMsg = envelope.getResponse().toString();
+                
+                if (Boolean.valueOf(webMsg.substring(0, webMsg.indexOf("|")))) {
+                    movFinanc.setSituacao(Character.valueOf('R'));
+                    Calendar dataRealizada = Calendar.getInstance();
+                    dataRealizada.set(dataRealizada.get(Calendar.YEAR), dataRealizada.get(Calendar.MONTH), dataRealizada.get(Calendar.DAY_OF_MONTH));
+                    movFinanc.setDataRealizada(dataRealizada.getTime());
+                    return;
+                }
+                this.errorMessages.add(webMsg.substring(webMsg.indexOf("|") + 1));
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.errorMessages.add("Descupe, um erro ocorreu ao tentar realizar a movimentação.");
+                return;
+            }
+        }else
+        	this.errorMessages.add("Não foi possivel estabelecer conexão com o servidor!");
+    }
+	
 	protected void callWSDeleteMovimentacaoFinanceira(
 			MovimentacaoFinanceira movFinanc,
 			List<MovimentacaoFinanceira> listMovFinac,
