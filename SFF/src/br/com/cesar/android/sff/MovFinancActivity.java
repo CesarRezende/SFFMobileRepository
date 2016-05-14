@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -56,6 +57,7 @@ public class MovFinancActivity extends Activity implements TaskListener {
 	private static final int TIPOGASTO_REQUEST_TASK = 1;
 	private static final int MOVFINANC_EDIT_REQUEST_TASK = 2;
 	private static final int MOVFINANC_INSERT_REQUEST_TASK = 3;
+	private static final int CALENDAR_REQUEST_TASK = 4;
 
 	@Override
 	protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -69,6 +71,18 @@ public class MovFinancActivity extends Activity implements TaskListener {
 
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CALENDAR_REQUEST_TASK && data != null) {
+            EditText dateField = (EditText) findViewById(data.getIntExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, 0));
+            if (resultCode == RESULT_OK) {
+                String dateStr = data.getStringExtra(DateChooserActivity.DATE_STRING_PARAM_VALUE);
+                if (dateStr != null) {
+                    dateField.setText(dateStr);
+                }
+            }
+        }
+    }
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -143,59 +157,60 @@ public class MovFinancActivity extends Activity implements TaskListener {
 
 			manualChkField.setChecked(this.movFinanc.isManual());
 
-			this.statusExpectedOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			statusExpectedOpt.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					movFinanc.setSituacao('P');
+					movFinanc.setDataRealizada(null);
+					fulfillmentDateField.setText("");
+					fulfillmentDateField.setEnabled(false);
+				}
+			});
+            this.statusAccomplishOpt.setOnClickListener(new OnClickListener() {
 				
 				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					MovFinancActivity.this.movFinanc.setSituacao(Character.valueOf('P'));
-	                MovFinancActivity.this.movFinanc.setDataRealizada(null);
-	                MovFinancActivity.this.fulfillmentDateField.setText("");
-	                MovFinancActivity.this.fulfillmentDateField.setEnabled(false);
+				public void onClick(View v) {
+						movFinanc.setSituacao('R');
+						movFinanc.setDataRealizada(null);
+						fulfillmentDateField.setText("");
+						fulfillmentDateField.setEnabled(true);
 					
 				}
 			});
-            this.statusAccomplishOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            this.movtypeCreditOpt.setOnClickListener(new OnClickListener() {
 				
 				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					MovFinancActivity.this.movFinanc.setSituacao(Character.valueOf('R'));
-	                MovFinancActivity.this.movFinanc.setDataRealizada(null);
-	                MovFinancActivity.this.fulfillmentDateField.setText("");
-	                MovFinancActivity.this.fulfillmentDateField.setEnabled(true);
-					
-				}
-			});
-            this.movtypeCreditOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				public void onClick(View v) {
 					MovFinancActivity.this.movFinanc.setTipoMovimentacao(Character.valueOf('C'));
 	                MovFinancActivity.this.spendTypeFieldPos = -1;
 	                MovFinancActivity.this.tipoGastoList = new ArrayList();
 	                MovFinancActivity.this.renderSpendTypeField();
 	                MovFinancActivity.this.spendTypeField.setEnabled(false);
+					
 				}
 			});
-            this.movtypeDebitOpt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            this.movtypeDebitOpt.setOnClickListener(new OnClickListener() {
 				
 				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				public void onClick(View v) {
+					movFinanc.setTipoMovimentacao(Character.valueOf('D'));
+					loadTipoGasto();
+					spendTypeField.setEnabled(true);
 
-					MovFinancActivity.this.movFinanc.setTipoMovimentacao(Character.valueOf('D'));
-	                MovFinancActivity.this.loadTipoGasto();
-	                MovFinancActivity.this.spendTypeField.setEnabled(true);
 				}
 			});
+           
             this.expectedDateField.setOnTouchListener(new OnTouchListener() {
 				
 				@Override
 				public boolean onTouch(View view, MotionEvent event) {
-//					if (event.getAction() == 0) {
-//		                view.clearFocus();
-//		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
-//		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
-//		                MovFinancActivity.this.movFinancActivity.startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.TIPOGASTO_REQUEST_TASK);
-//		            }
+					if (event.getAction() == MotionEvent.ACTION_DOWN) {
+		                view.clearFocus();
+		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
+		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
+		                startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.CALENDAR_REQUEST_TASK);
+		            }
 		            return true;
 				}
 			});
@@ -203,12 +218,12 @@ public class MovFinancActivity extends Activity implements TaskListener {
 				
 				@Override
 				public boolean onTouch(View view, MotionEvent event) {
-//					if (event.getAction() == 0) {
-//		                view.clearFocus();
-//		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
-//		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
-//		                MovFinancActivity.this.movFinancActivity.startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.TIPOGASTO_REQUEST_TASK);
-//		            }
+					if (event.getAction() == MotionEvent.ACTION_DOWN) {
+		                view.clearFocus();
+		                Intent dateChooserActiviryCaller = new Intent(MovFinancActivity.this, DateChooserActivity.class);
+		                dateChooserActiviryCaller.putExtra(DateChooserActivity.TEXT_FIELD_PARAM_ID, view.getId());
+		                startActivityForResult(dateChooserActiviryCaller, MovFinancActivity.CALENDAR_REQUEST_TASK);
+		            }
 		            return true;
 				}
 			});
@@ -240,77 +255,8 @@ public class MovFinancActivity extends Activity implements TaskListener {
 				expectedDateField.setEnabled(false);
 				movtypeCreditOpt.setEnabled(false);
 				movtypeDebitOpt.setEnabled(false);
+				spendTypeField.setEnabled(false);
 			}
-
-			statusExpectedOpt
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-
-							if (isChecked) {
-								movFinanc.setSituacao('P');
-								movFinanc.setDataRealizada(null);
-								fulfillmentDateField.setText("");
-								fulfillmentDateField.setEnabled(false);
-							}
-
-						}
-					});
-
-			statusAccomplishOpt
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-
-							if (isChecked) {
-								movFinanc.setSituacao('R');
-								movFinanc.setDataRealizada(null);
-								fulfillmentDateField.setText("");
-								fulfillmentDateField.setEnabled(true);
-							}
-
-						}
-					});
-
-			movtypeCreditOpt
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-
-							if (isChecked) {
-
-								movFinanc.setTipoMovimentacao('C');
-								spendTypeFieldPos = -1;
-								tipoGastoList = new ArrayList<TipoGasto>();
-								renderSpendTypeField();
-								spendTypeField.setEnabled(false);
-							}
-
-						}
-					});
-
-			movtypeDebitOpt
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-
-							if (isChecked) {
-
-								movFinanc.setTipoMovimentacao('D');
-								loadTipoGasto();
-								spendTypeField.setEnabled(true);
-							}
-
-						}
-					});
 
 		}
 

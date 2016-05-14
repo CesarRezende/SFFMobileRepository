@@ -43,6 +43,14 @@
                 android:value="br.com.cesar.android.sff.MainActivity" />
         </activity>
         <activity
+            android:name=".DateChooserActivity"
+            android:label="@string/title_activity_date_chooser"
+            android:parentActivityName=".MovFinancActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="br.com.cesar.android.sff.DateChooserActivity" />
+        </activity>
+        <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" 
             android:parentActivityName=".MainActivity">

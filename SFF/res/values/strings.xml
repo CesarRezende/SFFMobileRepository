@@ -53,6 +53,7 @@
     <string name="movfinanc_descr_label">Descrição:</string>
 
     <string name="title_activity_login">Sistema Financeiro Familiar</string>
+    <string name="title_activity_date_chooser">Calendário</string>
     <string name="login_label">Login</string>
     <string name="login_user_label">Usuario:</string>
     <string name="login_password_label">Senha:</string>
