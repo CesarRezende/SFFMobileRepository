@@ -1,21 +1,56 @@
 package br.com.cesar.android.sff;
 
 import android.app.Application;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class SFFApp extends Application {
-	
-	
-	@Override
-	public void onCreate() {
+    private static int menuPosition;
+    private static int yearMonth;
+    private static int year;
+    private static int month;
 
-		super.onCreate();
+    static {
+        yearMonth = 0;
+        menuPosition = 0;
+    }
+
+    public static void setYearMonth(Calendar date) {
+        SimpleDateFormat monthFormatter = new SimpleDateFormat("MM", new Locale("pt", "BR"));
+        year = Integer.valueOf(new SimpleDateFormat("yyyy", new Locale("pt", "BR")).format(date.getTime())).intValue();
+        month = Integer.valueOf(monthFormatter.format(date.getTime()));
+        yearMonth = (year * 100) + month;
+    }
+
+
+	public static int getYearMonth() {
+        return yearMonth;
+    }
+
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    public void onTerminate() {
+        super.onTerminate();
+    }
+
+    public static int getMenuPosition() {
+        return menuPosition;
+    }
+
+    public static void setMenuPosition(int menuPosition) {
+        menuPosition = menuPosition;
+    }
+    
+    public static int getYear() {
+		return year;
 	}
-	
-	
-	@Override
-	public void onTerminate() {
 
-		super.onTerminate();
+	public static int getMonth() {
+		return month;
 	}
 
 }
+

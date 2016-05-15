@@ -34,11 +34,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -59,7 +61,6 @@ public class MainActivity extends Activity {
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 	private String[] mMenuOptions;
-	private int menuPosition = 0;
 	private boolean mSearchOpened;
 	private String mSearchQuery;
 	private Drawable mIconOpenSearch;
@@ -74,6 +75,8 @@ public class MainActivity extends Activity {
 	private SharedPreferences prefs;
 	private static boolean authoriedUser = false;
 	private static boolean ocurredError = false;
+	private TextView yearMonthField;
+	private View yearmonthComponent;
 
 	@Override
 	protected void onDestroy() {
@@ -229,6 +232,15 @@ public class MainActivity extends Activity {
 				invalidateOptionsMenu();
 				closeSearchBar();
 			}
+			
+			public void onDrawerSlide(View drawerView, float slideOffset) {
+	            super.onDrawerSlide(drawerView, slideOffset);
+	            if (mDrawerLayout.isDrawerOpen(MainActivity.this.mDrawerList)) {
+	                yearmonthComponent.setVisibility(View.VISIBLE);
+	            } else {
+	                yearmonthComponent.setVisibility(View.GONE);
+	            }
+	        }
 
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -239,11 +251,59 @@ public class MainActivity extends Activity {
 				R.drawable.ic_action_close_search);
 	}
 
+	private void renderYearMonthComponent() {
+        this.yearmonthComponent = findViewById(R.id.yearmonth_component);
+        this.yearMonthField = (TextView) findViewById(R.id.year_month_field);
+        String yearMonthStr = Integer.toString(SFFApp.getYearMonth());
+        this.yearMonthField.setText(yearMonthStr.substring(4) + "/" + yearMonthStr.substring(0, 3));
+    }
+	
+	private void resetActivity() {
+        finish();
+        startActivity(getIntent());
+    }
+	
+    private void setYearMonthComponent() {
+        if (SFFApp.getYearMonth() <= 0) {
+            SFFApp.setYearMonth(Calendar.getInstance());
+        }
+        renderYearMonthComponent();
+        ImageButton nextYearMonthButton = (ImageButton) findViewById(R.id.next_yearmonth_button);
+        ((ImageButton) findViewById(R.id.previews_yearmonth_button)).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+	            Calendar date = Calendar.getInstance();
+	            date.set(SFFApp.getYear(), 
+	            		SFFApp.getMonth() - 1, 
+	            		1);
+	            date.add(Calendar.MONTH, -1);
+	            SFFApp.setYearMonth(date);
+	            resetActivity();
+	        }
+		});
+        nextYearMonthButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Calendar date = Calendar.getInstance();
+	            date.set(SFFApp.getYear(), 
+	            		SFFApp.getMonth() - 1, 
+	            		1);
+	            date.add(Calendar.MONTH, +1);
+	            SFFApp.setYearMonth(date);
+	            resetActivity();
+			}
+		});
+    }
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		setYearMonthComponent();
+		
 		verifyWebServAddressesRecord();
 
 		if (!isOcurredError())
@@ -255,14 +315,12 @@ public class MainActivity extends Activity {
 
 		if (savedInstanceState == null) {
 			selectMenuItem(0);
-			menuPosition = 0;
 
 			mSearchOpened = false;
 			mSearchQuery = "";
 		} else {
 			mSearchOpened = savedInstanceState.getBoolean(SEARCH_OPENED);
 			mSearchQuery = savedInstanceState.getString(SEARCH_QUERY);
-			menuPosition = savedInstanceState.getInt(MENU_POSITION, 0);
 		}
 
 	}
@@ -328,7 +386,7 @@ public class MainActivity extends Activity {
 			break;
 		case R.id.action_insert:
 
-			switch (mMenuOptions[this.menuPosition]) {
+			switch (mMenuOptions[SFFApp.getMenuPosition()]) {
 			case "Movimentação Finaceira":
 				Intent movFinancActivityCaller = new Intent(MainActivity.this,
 						MovFinancActivity.class);
@@ -436,7 +494,6 @@ public class MainActivity extends Activity {
 		// mMoviesFiltered);
 		outState.putBoolean(SEARCH_OPENED, mSearchOpened);
 		outState.putString(SEARCH_QUERY, mSearchQuery);
-		outState.putInt(MENU_POSITION, this.menuPosition);
 	}
 
 	@Override
@@ -448,10 +505,12 @@ public class MainActivity extends Activity {
 
 	private void selectMenuItem(int position) {
 
-		this.menuPosition = position;
+		SFFApp.setMenuPosition(position);
 
 		if (mMenuOptions[position].equals("Alterar Usuario")) {
-
+			
+			SFFApp.setMenuPosition(0);
+			
 			Editor editor = prefs.edit();
 			editor.putBoolean(LoginActivity.AUTHORIZED_USER, false);
 			editor.putString(LoginActivity.USER_ID, "");
@@ -473,6 +532,7 @@ public class MainActivity extends Activity {
 			return;
 		}else if(mMenuOptions[position].equals("Sair")){
 			
+			SFFApp.setMenuPosition(0);
 			finish();
 			return;
 		}
@@ -501,7 +561,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			selectMenuItem(position);
+			selectMenuItem(SFFApp.getMenuPosition());
 
 		}
 	}
@@ -607,7 +667,7 @@ public class MainActivity extends Activity {
 			((MainActivity) getActivity()).listSearchListener = this;
 			((MainActivity) getActivity()).listItemActionMode = this;
 
-			int i = getArguments().getInt(OPTION_NUMBER);
+			int i = SFFApp.getMenuPosition();
 			options = getResources().getStringArray(R.array.menu_options);
 			String menu = options[i];
 			int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? android.R.layout.simple_list_item_activated_1
@@ -709,7 +769,7 @@ public class MainActivity extends Activity {
 
 			if (errorMessages == null || errorMessages.size() <= 0) {
 
-				int i = getArguments().getInt(OPTION_NUMBER);
+				int i = SFFApp.getMenuPosition();
 				String menu = options[i];
 
 				switch (menu) {
@@ -793,7 +853,7 @@ public class MainActivity extends Activity {
 			inSearch = false;
 			this.listView = getListView();
 
-			int i = getArguments().getInt(OPTION_NUMBER);
+			int i = SFFApp.getMenuPosition();
 			String menu = options[i];
 
 			switch (menu) {
@@ -891,7 +951,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void performSearch(String query) {
 			this.listView = getListView();
-			int i = getArguments().getInt(OPTION_NUMBER);
+			int i = SFFApp.getMenuPosition();
 			String menu = options[i];
 
 			switch (menu) {

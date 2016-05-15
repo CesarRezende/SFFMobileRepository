@@ -94,9 +94,8 @@ public class WSMovFinacTask extends GenericWSTask {
 		SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy",
 				new Locale("pt", "BR"));
 
-		String yearMonth = yearFormatter.format(now.getTime())
-				+ monthFormatter.format(now.getTime());
-		soap.addProperty("yearMonth", yearMonth);
+
+		soap.addProperty("yearMonth", Integer.toString(SFFApp.getYearMonth()));
 		soap.addProperty("userId", this.userID);
 		soap.addProperty("password", this.password);
 
