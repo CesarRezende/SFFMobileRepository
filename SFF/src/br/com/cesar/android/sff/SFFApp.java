@@ -37,11 +37,11 @@ public class SFFApp extends Application {
     }
 
     public static int getMenuPosition() {
-        return menuPosition;
+        return SFFApp.menuPosition;
     }
 
     public static void setMenuPosition(int menuPosition) {
-        menuPosition = menuPosition;
+    	SFFApp.menuPosition = menuPosition;
     }
     
     public static int getYear() {

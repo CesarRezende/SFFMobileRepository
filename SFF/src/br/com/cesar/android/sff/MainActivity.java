@@ -561,7 +561,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			selectMenuItem(SFFApp.getMenuPosition());
+			selectMenuItem(position);
 
 		}
 	}
@@ -674,6 +674,11 @@ public class MainActivity extends Activity {
 					: android.R.layout.simple_list_item_1;
 
 			switch (menu) {
+			case "Dashboard":
+				initLayout();
+				this.listView.setAdapter(new ArrayAdapter<String>(
+						getActivity(), layout, new String[] { "" }));
+				break;
 			case "Movimentação Finaceira":
 				if ((this.listMovFinac == null || this.listMovFinac.size() <= 0)
 						&& MainActivity.isAuthoriedUser()
@@ -773,6 +778,8 @@ public class MainActivity extends Activity {
 				String menu = options[i];
 
 				switch (menu) {
+				case "Dashboard":
+					break;
 				case "Movimentação Finaceira":
 
 					Collections.sort(this.listMovFinac,

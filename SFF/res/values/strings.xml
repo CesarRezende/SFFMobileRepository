@@ -7,11 +7,12 @@
     <string name="action_settings">Configurações</string>
 
     <string-array name="menu_options">
+        <item>Dashboard</item>
         <item>Movimentação Finaceira</item>
-        <item>Entrada Variavel</item>
+        <!--<item>Entrada Variavel</item>
         <item>Saida Variavel</item>
         <item>Entrada Fixa</item>
-        <item>Saida Fixa</item>
+        <item>Saida Fixa</item>-->
         <item>Alterar Usuario</item>
         <item>Sair</item>
     </string-array>

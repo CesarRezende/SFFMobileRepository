@@ -1,105 +1,163 @@
 package br.com.cesar.android.sff;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing.EasingOption;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.Legend.LegendPosition;
 import com.github.mikephil.charting.data.ChartData;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.highlight.Highlight;
+
+import java.util.List;
+
+import org.xmlpull.v1.XmlPullParser;
 
 public class PieChartItem extends ChartItem {
+	private boolean calcSaldo;
+	private List<Double> pieChartValues;
 
-    private Typeface mTf;
-    private SpannableString mCenterText;
-    private ArrayList<Double> pieChartValues;
+	private static class ViewHolder {
+		PieChart chart;
+		TextView chartTitle;
+		List<String> legendLabels;
+		ViewGroup legends;
 
-    public PieChartItem(ChartData<?> cd, Context c, ArrayList<Double> pieChartValues) {
-        super(cd);
+		private ViewHolder() {
+		}
+	}
 
-        mTf = Typeface.createFromAsset(c.getAssets(), "OpenSans-Regular.ttf");
-        mCenterText = generateCenterText();
-        pieChartValues = pieChartValues;
-    }
+	private static class ChartValueSelectedListener implements
+			OnChartValueSelectedListener {
+		private Context context;
+		private List<String> legendLabels;
+		private List<Double> pieChartValues;
 
-    @Override
-    public int getItemType() {
-        return TYPE_PIECHART;
-    }
+		public ChartValueSelectedListener(Context context,
+				List<String> legendLabels, List<Double> pieChartValues) {
+			this.context = context;
+			this.legendLabels = legendLabels;
+			this.pieChartValues = pieChartValues;
+		}
 
-    @Override
-    public View getView(int position, View convertView, Context c) {
+		@Override
+		public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+			Toast.makeText(
+					this.context,
+					this.legendLabels.get(e.getXIndex())
+							+ " - "
+							+ SFFUtil.getFormattedNumber(this.pieChartValues
+									.get(e.getXIndex())), 0).show();
+		}
 
-        ViewHolder holder = null;
+		public void onNothingSelected() {
 
-        if (convertView == null) {
+		}
 
-            holder = new ViewHolder();
+	}
 
-            convertView = LayoutInflater.from(c).inflate(
-                    R.layout.list_item_piechart, null);
-            holder.chart = (PieChart) convertView.findViewById(R.id.chart);
+	public PieChartItem(ChartData<?> cd, Context context,
+			List<Double> pieChartValues) {
+		super(cd);
+		this.pieChartValues = pieChartValues;
+	}
 
-            convertView.setTag(holder);
+	public int getItemType() {
+		return TYPE_PIECHART;
+	}
 
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+	public View getView(int position, View convertView, Context c) {
 
-        // apply styling
-        holder.chart.setDescription("");
-        holder.chart.setHoleRadius(52f);
-        holder.chart.setTransparentCircleRadius(57f);
-        holder.chart.setCenterText(mCenterText);
-        holder.chart.setCenterTextTypeface(mTf);
-        holder.chart.setCenterTextSize(9f);
-        holder.chart.setUsePercentValues(true);
-        holder.chart.setExtraOffsets(5, 10, 50, 10);
+		ViewHolder holder;
 
-        
-        mChartData.setValueFormatter(new PercentFormatter());
-        mChartData.setValueTypeface(mTf);
-        mChartData.setValueTextSize(11f);
-        mChartData.setValueTextColor(Color.WHITE);
-        
-        // set data
-        holder.chart.setData((PieData) mChartData);
+		if (convertView == null) {
 
-        Legend l = holder.chart.getLegend();
-        l.setPosition(LegendPosition.RIGHT_OF_CHART);
-        l.setYEntrySpace(0f);
-        l.setYOffset(0f);
+			holder = new ViewHolder();
 
-        // do not forget to refresh the chart
-        // holder.chart.invalidate();
-        holder.chart.animateY(900);
+			convertView = LayoutInflater.from(c).inflate(
+					R.layout.list_item_piechart, null);
 
-        return convertView;
-    }
+			holder.chart = (PieChart) convertView.findViewById(R.id.chart);
 
-    private SpannableString generateCenterText() {
-        SpannableString s = new SpannableString("MPAndroidChart\ncreated by\nPhilipp Jahoda");
-        s.setSpan(new RelativeSizeSpan(1.6f), 0, 14, 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.VORDIPLOM_COLORS[0]), 0, 14, 0);
-        s.setSpan(new RelativeSizeSpan(.9f), 14, 25, 0);
-        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, 25, 0);
-        s.setSpan(new RelativeSizeSpan(1.4f), 25, s.length(), 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), 25, s.length(), 0);
-        return s;
-    }
+			convertView.setTag(holder);
 
-    private static class ViewHolder {
-        PieChart chart;
-    }
+		} else {
+
+			holder = (ViewHolder) convertView.getTag();
+
+		}
+
+		holder.chartTitle = (TextView) convertView
+				.findViewById(R.id.char_title);
+
+		holder.legends = (ViewGroup) convertView
+				.findViewById(R.id.chart_legends);
+
+		holder.legends.removeAllViews();
+
+		holder.legendLabels = this.mChartData.getXVals();
+
+		int[] legend_color = this.mChartData.getColors();
+
+		for (int i = 0; i < holder.legendLabels.size(); i++) {
+
+			View legendItem = LayoutInflater.from(c).inflate(
+					R.layout.list_item_chart_legends, null);
+
+			legendItem.findViewById(R.id.char_legend_color_container)
+					.setBackgroundColor(legend_color[i]);
+
+			((TextView) legendItem.findViewById(R.id.char_legend_label))
+					.setText(holder.legendLabels.get(i)
+							+ " - R$ "
+							+ SFFUtil.getFormattedNumber(this.pieChartValues
+									.get(i)));
+
+			holder.legends.addView(legendItem);
+
+			if (isCalcSaldo()) {
+				legendItem = LayoutInflater.from(c).inflate(
+						R.layout.list_item_chart_legends, null);
+				
+				legendItem.findViewById(R.id.char_legend_color_container)
+						.setBackgroundColor(Color.TRANSPARENT);
+				
+				((TextView) legendItem.findViewById(R.id.char_legend_label))
+						.setText("Saldo Restante - R$"
+								+ SFFUtil.getFormattedNumber(this.pieChartValues.get(1) -  this.pieChartValues.get(0)));
+				
+				holder.legends.addView(legendItem);
+			}
+		}
+
+		holder.chart.setDescription("");
+		holder.chart.setDrawHoleEnabled(false);
+		holder.chart.setUsePercentValues(true);
+		holder.chart.setRotationEnabled(false);
+		holder.chartTitle.setText(this.mChartData.getDataSetByIndex(0)
+				.getLabel());
+		holder.chart
+				.setOnChartValueSelectedListener(new ChartValueSelectedListener(
+						c, holder.legendLabels, this.pieChartValues));
+		holder.chart.setDrawSliceText(false);
+		holder.chart.setData((PieData) this.mChartData);
+		holder.chart.getLegend().setEnabled(false);
+		holder.chart.animateY(1500, EasingOption.EaseInOutQuad);
+		return convertView;
+	}
+
+	public boolean isCalcSaldo() {
+		return this.calcSaldo;
+	}
+
+	public void setCalcSaldo(boolean calcSaldo) {
+		this.calcSaldo = calcSaldo;
+	}
 }
