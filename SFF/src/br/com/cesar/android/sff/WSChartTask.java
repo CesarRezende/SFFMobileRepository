@@ -100,7 +100,6 @@ public class WSChartTask extends GenericWSTask {
                     dataSet.setColors((List) colors);
                     PieData data = new PieData(chartLegends, dataSet);
                     data.setValueFormatter(new PercentFormatter());
-                    data.setValueTextSize(11.0f);
                     data.setValueTextColor(ViewCompat.MEASURED_STATE_MASK);
                     chartList.add(new PieChartItem(data, this.context, pieChartValues));
                     return;
@@ -154,10 +153,9 @@ public class WSChartTask extends GenericWSTask {
                     dataSet.setColors((List) colors);
                     PieData data = new PieData(chartLegends, dataSet);
                     data.setValueFormatter(new PercentFormatter());
-                    data.setValueTextSize(11.0f);
                     data.setValueTextColor(ViewCompat.MEASURED_STATE_MASK);
                     PieChartItem pieChartItem = new PieChartItem(data, this.context, pieChartValues);
-                    //pieChartItem.setCalcSaldo(true);
+                    pieChartItem.setCalcSaldo(true);
                     chartList.add(pieChartItem);
                     return;
                 }
@@ -208,10 +206,9 @@ public class WSChartTask extends GenericWSTask {
                     dataSet.setColors((List) colors);
                     PieData data = new PieData(chartLegends, dataSet);
                     data.setValueFormatter(new PercentFormatter());
-                    data.setValueTextSize(11.0f);
                     data.setValueTextColor(ViewCompat.MEASURED_STATE_MASK);
                     PieChartItem pieChartItem = new PieChartItem(data, this.context, pieChartValues);
-                    //pieChartItem.setCalcSaldo(true);
+                    pieChartItem.setCalcSaldo(true);
                     chartList.add(pieChartItem);
                     return;
                 }

@@ -313,9 +313,9 @@ public class MainActivity extends Activity {
 
 		configDrawerMenu();
 
-		if (savedInstanceState == null) {
-			selectMenuItem(0);
+		selectMenuItem(SFFApp.getMenuPosition());
 
+		if (savedInstanceState == null) {
 			mSearchOpened = false;
 			mSearchQuery = "";
 		} else {
@@ -596,8 +596,10 @@ public class MainActivity extends Activity {
 		private static final int MOVFINANC_CONSULT_REQUEST_TASK = 1;
 		private static final int MOVFINANC_DELETE_REQUEST_TASK = 2;
 		private static final int MOVFINANC_ACCOMPLISH_REQUEST_TASK = 3;
+		private static final int CHART_REQUEST_TASK = 4;
+		private ArrayList<ChartItem> chartList;
 		
-		private WSMovFinacTask task;
+		private GenericWSTask task;
 		private ProgressDialog pDialog;
 		private List<MovimentacaoFinanceira> listMovFinac = new ArrayList<MovimentacaoFinanceira>();
 		private List<MovimentacaoFinanceira> filtedListMovFinac = new ArrayList<MovimentacaoFinanceira>();
@@ -675,9 +677,18 @@ public class MainActivity extends Activity {
 
 			switch (menu) {
 			case "Dashboard":
-				initLayout();
-				this.listView.setAdapter(new ArrayAdapter<String>(
-						getActivity(), layout, new String[] { "" }));
+				if ((this.chartList == null || this.chartList.size() <= 0)
+						&& MainActivity.isAuthoriedUser()
+						&& !MainActivity.isOcurredError()) {
+
+					initLayout();
+					task = new WSChartTask(getActivity(), this,
+							CHART_REQUEST_TASK);
+					task.execute(this.chartList);
+					setListAdapter(new ChartDataAdapter(getActivity(),layout, R.id.textview1,
+							this.chartList));
+				}
+				setListAdapter(new ChartDataAdapter(getActivity(),layout, R.id.textview1, this.chartList));
 				break;
 			case "Movimentação Finaceira":
 				if ((this.listMovFinac == null || this.listMovFinac.size() <= 0)
@@ -732,7 +743,7 @@ public class MainActivity extends Activity {
 			this.listView = getListView();
 			this.filtedListMovFinac = new ArrayList<MovimentacaoFinanceira>();
 			listMovFinac = new ArrayList<MovimentacaoFinanceira>();
-
+			this.chartList = new ArrayList();
 		}
 
 		@Override
@@ -779,6 +790,9 @@ public class MainActivity extends Activity {
 
 				switch (menu) {
 				case "Dashboard":
+					int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? android.R.layout.simple_list_item_activated_1
+							: android.R.layout.simple_list_item_1;
+					setListAdapter(new ChartDataAdapter(getActivity(), layout, R.id.textview1, this.chartList));
 					break;
 				case "Movimentação Finaceira":
 
@@ -1105,6 +1119,25 @@ public class MainActivity extends Activity {
 
 	}
 
+	private static class ChartDataAdapter extends ArrayAdapter<ChartItem> {
+        public ChartDataAdapter(Context context, int resource,
+				int textViewResourceId,List<ChartItem> objects) {
+            super(context, resource, textViewResourceId , objects);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return ((ChartItem) getItem(position)).getView(position, convertView, getContext());
+        }
+
+        public int getItemViewType(int position) {
+            return ((ChartItem) getItem(position)).getItemType();
+        }
+
+        public int getViewTypeCount() {
+            return 3;
+        }
+    }
+	
 	public static class MovFinacArrayAdapter extends
 			ArrayAdapter<MovimentacaoFinanceira> {
 

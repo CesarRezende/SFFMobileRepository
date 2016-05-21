@@ -122,19 +122,21 @@ public class PieChartItem extends ChartItem {
 
 			holder.legends.addView(legendItem);
 
-			if (isCalcSaldo()) {
-				legendItem = LayoutInflater.from(c).inflate(
-						R.layout.list_item_chart_legends, null);
-				
-				legendItem.findViewById(R.id.char_legend_color_container)
-						.setBackgroundColor(Color.TRANSPARENT);
-				
-				((TextView) legendItem.findViewById(R.id.char_legend_label))
-						.setText("Saldo Restante - R$"
-								+ SFFUtil.getFormattedNumber(this.pieChartValues.get(1) -  this.pieChartValues.get(0)));
-				
-				holder.legends.addView(legendItem);
-			}
+			
+		}
+		
+		if (isCalcSaldo()) {
+			View legendItem = LayoutInflater.from(c).inflate(
+					R.layout.list_item_chart_legends, null);
+			
+			legendItem.findViewById(R.id.char_legend_color_container)
+					.setBackgroundColor(Color.GREEN);
+			
+			((TextView) legendItem.findViewById(R.id.char_legend_label))
+					.setText("Saldo Restante - R$"
+							+ SFFUtil.getFormattedNumber(this.pieChartValues.get(1) -  this.pieChartValues.get(0)));
+			
+			holder.legends.addView(legendItem);
 		}
 
 		holder.chart.setDescription("");
