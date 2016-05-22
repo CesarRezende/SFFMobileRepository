@@ -583,10 +583,8 @@ public class MainActivity extends Activity {
 		public void afterTextChanged(Editable editable) {
 			mSearchQuery = mSearchEt.getText().toString();
 
-			if (!mSearchQuery.equals("")) {
+			listSearchListener.performSearch(mSearchQuery);
 
-				listSearchListener.performSearch(mSearchQuery);
-			}
 		}
 
 	}
@@ -997,9 +995,11 @@ public class MainActivity extends Activity {
 		@Override
 		public void performSearch(String query) {
 			this.listView = getListView();
+			boolean isQueryNullOrBlank = SFFUtil.isNullOrBlank(query);
 			int i = SFFApp.getMenuPosition();
 			String menu = options[i];
 
+			
 			switch (menu) {
 			case "Movimentação Finaceira":
 				this.filtedListMovFinac = new ArrayList<MovimentacaoFinanceira>();
@@ -1007,9 +1007,11 @@ public class MainActivity extends Activity {
 				for (MovimentacaoFinanceira movFinac : this.listMovFinac) {
 
 					String descr = movFinac.getDescricao();
-
-					if (descr.toUpperCase(new Locale("pt", "BR")).startsWith(
-							query.toUpperCase(new Locale("pt", "BR"))))
+					if (!isQueryNullOrBlank) {
+						if (descr.toUpperCase(new Locale("pt", "BR")).contains(
+								query.toUpperCase(new Locale("pt", "BR"))))
+							filtedListMovFinac.add(movFinac);
+					} else
 						filtedListMovFinac.add(movFinac);
 				}
 
