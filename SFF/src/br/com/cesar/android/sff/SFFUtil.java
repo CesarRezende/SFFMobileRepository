@@ -208,4 +208,16 @@ public class SFFUtil {
 		return returnValue;
 	}
 	
+	public static boolean IsDateThatYearMonth(Date date, int year, int month){
+		boolean isDateThatYearMonth = false;
+		
+		Calendar dateC = Calendar.getInstance();
+		dateC.setTime(date);
+		
+		isDateThatYearMonth = dateC.get(Calendar.YEAR) == year && dateC.get(Calendar.MONTH) == (month -1); 
+		
+		return isDateThatYearMonth;
+		
+	}
 }
+

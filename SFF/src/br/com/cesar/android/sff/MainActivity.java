@@ -3,6 +3,7 @@ package br.com.cesar.android.sff;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -917,11 +918,20 @@ public class MainActivity extends Activity {
 					MovimentacaoFinanceira movFinanc = (MovimentacaoFinanceira) data
 							.getSerializableExtra("movFinanc");
 
+					Date dataReferencia = movFinanc.getDataRealizada() != null ? movFinanc
+							.getDataRealizada() : movFinanc.getDataPrevista();
+
 					MovimentacaoFinanceira oldMovFinanc = MovimentacaoFinanceira
 							.findMovimentacaoFinanceira(listMovFinac,
 									movFinanc.getId());
-					listMovFinac.set(listMovFinac.indexOf(oldMovFinanc),
-							movFinanc);
+
+					if (SFFUtil.IsDateThatYearMonth(dataReferencia,
+							SFFApp.getYear(), SFFApp.getMonth()))
+						listMovFinac.set(listMovFinac.indexOf(oldMovFinanc),
+								movFinanc);
+					else
+						listMovFinac.remove(listMovFinac.indexOf(oldMovFinanc));
+
 					Collections.sort(this.listMovFinac,
 							MovimentacaoFinanceira.getComparator());
 
@@ -930,9 +940,15 @@ public class MainActivity extends Activity {
 						oldMovFinanc = MovimentacaoFinanceira
 								.findMovimentacaoFinanceira(filtedListMovFinac,
 										movFinanc.getId());
+
+						if (SFFUtil.IsDateThatYearMonth(dataReferencia,
+								SFFApp.getYear(), SFFApp.getMonth()))
 						filtedListMovFinac.set(
 								filtedListMovFinac.indexOf(oldMovFinanc),
 								movFinanc);
+						else
+							filtedListMovFinac.remove(filtedListMovFinac.indexOf(oldMovFinanc));
+						
 						Collections.sort(this.filtedListMovFinac,
 								MovimentacaoFinanceira.getComparator());
 					}
@@ -949,13 +965,22 @@ public class MainActivity extends Activity {
 					MovimentacaoFinanceira movFinanc = (MovimentacaoFinanceira) data
 							.getSerializableExtra("movFinanc");
 
-					listMovFinac.add(movFinanc);
+					Date dataReferencia = movFinanc.getDataRealizada() != null ? movFinanc
+							.getDataRealizada() : movFinanc.getDataPrevista();
+
+					if (SFFUtil.IsDateThatYearMonth(dataReferencia,
+							SFFApp.getYear(), SFFApp.getMonth()))
+						listMovFinac.add(movFinanc);
+
 					Collections.sort(this.listMovFinac,
 							MovimentacaoFinanceira.getComparator());
 
 					if (inSearch) {
 
-						filtedListMovFinac.add(movFinanc);
+						if (SFFUtil.IsDateThatYearMonth(dataReferencia,
+								SFFApp.getYear(), SFFApp.getMonth()))
+							filtedListMovFinac.add(movFinanc);
+
 						Collections.sort(this.filtedListMovFinac,
 								MovimentacaoFinanceira.getComparator());
 					}
